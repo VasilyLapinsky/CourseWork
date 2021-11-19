@@ -14,6 +14,6 @@ public:
 
 public:
 	virtual void print(std::ostream& out) = 0;
-	virtual Json::Value Serialize() = 0;
-	virtual void DeSerialize(Json::Value) = 0;
+	virtual void Serialize(Json::Value&, std::ofstream&) = 0;
+	virtual void DeSerialize(Json::Value&, std::ifstream&) = 0;
 };

@@ -8,6 +8,7 @@
 #include "MaxPooling.h"
 #include "MathFunctions.h"
 #include <iostream>
+#include <fstream>
 #include <json/json.h>
 
 const std::string DATA_FOLDER = "C:/Course Work/data/";
@@ -40,12 +41,12 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 
 int main()
 {
+	/*
 	NeuralNet net;
 
 	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<MnistDatasetReader>(DATA_FOLDER);
 	net.train(datsetReader, 32, 1);
 
-	/*
 	double low = -500.0;
 	double high = +500.0;
 
@@ -86,4 +87,31 @@ int main()
 		std::cout << '\n';
 	}
 	*/
+	{
+		cv::Mat cpuData(5, 5, CV_64F);
+		cpuData = 1;
+		cpuData.at<double>(3, 2) = 2;
+		cpuData.at<double>(2, 3) = 3;
+		Tensor gpuData(cpuData);
+
+		Json::Value json; 
+		std::ofstream weigths("weigths.bin", std::ios::binary);
+		gpuData.Serrialize(json, weigths);
+		std::cout << json << std::endl;
+		std::ofstream output("config.json");
+		output << json;
+		output.close();
+	}
+	{
+		std::ifstream input("config.json");
+		std::ifstream weigths("weigths.bin", std::ios::binary);
+		Json::Value json;
+		input >> json;
+		std::cout << json << std::endl;
+
+		Tensor gpuReaded(json, weigths);
+		std::cout << TensorToCvMat(gpuReaded) << std::endl;
+		int check;
+		std::cin >> check;
+	}
 }

@@ -47,14 +47,13 @@ void MaxPooling::print(std::ostream&)
 
 }
 
-Json::Value MaxPooling::Serialize()
+void MaxPooling::Serialize(Json::Value& config, std::ofstream&)
 {
-	return Json::Value();
+	config["MaxPooling"] = "";
 }
 
-void MaxPooling::DeSerialize(Json::Value json)
+void MaxPooling::DeSerialize(Json::Value&, std::ifstream&)
 {
-
 }
 
 __global__ void max_pool(double* data, double* result, const uint pool, const uint stride,

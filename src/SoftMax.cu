@@ -43,14 +43,12 @@ void SoftMax::print(std::ostream& out)
     out << "SoftMax\n";
 }
 
-Json::Value SoftMax::Serialize()
+void SoftMax::Serialize(Json::Value& config, std::ofstream&)
 {
-    Json::Value json;
-    json["SoftMax"] = "";
-    return json;
+    config["SoftMax"] = "";
 }
 
-void SoftMax::DeSerialize(Json::Value)
+void SoftMax::DeSerialize(Json::Value&, std::ifstream&)
 {
 }
 

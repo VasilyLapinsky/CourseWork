@@ -8,12 +8,12 @@ class NeuralNet
 {
 public:
 	NeuralNet();
-	NeuralNet(std::string configfilePath);
+	NeuralNet(std::string configfilePath, std::string weightsPath);
 
 public:
 	void addLayer(std::shared_ptr<LayerInterface> layer);
-	void Save(std::string configfilePath);
-	void Load(std::string configfilePath);
+	void Save(std::string configfilePath, std::string weightsPath);
+	void Load(std::string configfilePath, std::string weightsPath);
 
 public:
 	void train(std::unique_ptr<DatasetReaderInterface> &datsetReader, int batchSize, int epoch);

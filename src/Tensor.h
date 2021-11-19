@@ -1,6 +1,7 @@
 #pragma once
 #include <opencv2/core.hpp>
 #include <json/json.h>
+#include <fstream>
 #include "HelpTools.h"
 
 struct Tensor
@@ -8,10 +9,12 @@ struct Tensor
 	Tensor();
 	Tensor(uint width, uint height, uint channels = 1, uint four = 1);
 	Tensor(const cv::Mat& value);
-	Tensor(Json::Value json);
 	Tensor(const Tensor& value);
+	Tensor(Json::Value& config, std::ifstream& binaryData);
 	Tensor(Tensor&& value);
 	virtual ~Tensor();
+
+	void Serrialize(Json::Value& config, std::ofstream& binaryData);
 
 	void operator+=(double value);
 	Tensor operator+(double value) const;
@@ -36,7 +39,6 @@ struct Tensor
 };
 
 cv::Mat TensorToCvMat(Tensor& value);
-Json::Value TensorToJson(Tensor& value);
 
 Tensor GenerateUniformDistributionTensor(uint width, uint height, uint channels, uint four);
 Tensor GenerateNormalDistributionTensor(uint width, uint height, uint channels, uint four, double mean, double stddev);

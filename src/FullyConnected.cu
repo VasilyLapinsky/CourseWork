@@ -87,22 +87,18 @@ void FullyConnected::print(std::ostream& out)
 	out << "Bias: " << TensorToCvMat(this->bias) << '\n';
 }
 
-Json::Value FullyConnected::Serialize()
+void FullyConnected::Serialize(Json::Value& config, std::ofstream& weigths)
 {
-	Json::Value json;
-
-	json["FullyConnected"]["lambda"] = this->lambda;
-	json["FullyConnected"]["weights"] = TensorToJson(this->weights);
-	json["FullyConnected"]["lambda"] = TensorToJson(this->bias);
-
-	return json;
+	config[FullyConnectedConfigNodeName]["lambda"] = this->lambda;
+	this->weights.Serrialize(config[FullyConnectedConfigNodeName]["weights"], weigths);
+	this->bias.Serrialize(config[FullyConnectedConfigNodeName]["bias"], weigths);
 }
 
-void FullyConnected::DeSerialize(Json::Value json)
+void FullyConnected::DeSerialize(Json::Value& config, std::ifstream& weigths)
 {
-	this->lambda = json["FullyConnected"]["lambda"].asDouble();
-	this->weights = Tensor(json["FullyConnected"]["weights"]);
-	this->bias = Tensor(json["FullyConnected"]["bias"]);
+	this->lambda = config[FullyConnectedConfigNodeName]["lambda"].asDouble();
+	this->weights = Tensor(config[FullyConnectedConfigNodeName]["weights"], weigths);
+	this->bias = Tensor(config[FullyConnectedConfigNodeName]["bias"], weigths);
 }
 
 Tensor FullyConnected::Forward(Tensor& input)

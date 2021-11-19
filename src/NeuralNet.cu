@@ -78,10 +78,10 @@ NeuralNet::NeuralNet()
 	this->cpuLayers.push_back(std::make_shared<cpu::SoftMax>());*/
 }
 
-NeuralNet::NeuralNet(std::string configfilePath)
+NeuralNet::NeuralNet(std::string configfilePath, std::string weightsPath)
 	: associationMap{ CreateAssociationMap() }
 {
-	this->Load(configfilePath);
+	this->Load(configfilePath, weightsPath);
 }
 
 void NeuralNet::addLayer(std::shared_ptr<LayerInterface> layer)
@@ -90,14 +90,31 @@ void NeuralNet::addLayer(std::shared_ptr<LayerInterface> layer)
 	this->layers.push_back(layer);
 }
 
-void NeuralNet::Save(std::string configfilePath)
+void NeuralNet::Save(std::string configfilePath, std::string weightsPath)
 {
-	
+	Json::Value config;
+	std::ofstream weights(weightsPath, std::ios::binary);
+
+	for (size_t i = 0; i < this->layers.size(); ++i)
+	{
+		this->layers[i]->Serialize(config["Layer" + std::to_string(i)], weights);
+	}
+
+	std::ofstream configWriter(configfilePath);
+	configWriter << config;
 }
 
-void NeuralNet::Load(std::string configfilePath)
+void NeuralNet::Load(std::string configfilePath, std::string weightsPath)
 {
-	
+	std::ifstream configReader(configfilePath);
+	Json::Value config;
+	configReader >> config;
+	std::ifstream weights(weightsPath, std::ios::binary);
+
+	for (size_t i = 0; i < this->layers.size(); ++i)
+	{
+		this->layers[i]->DeSerialize(config["Layer" + std::to_string(i)], weights);
+	}
 }
 
 

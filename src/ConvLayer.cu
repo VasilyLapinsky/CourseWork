@@ -3,6 +3,8 @@
 #include "device_functions.h"
 #include <iostream>
 
+const char* ConvLayerConfigNodeName = "ConvLayer";
+
 const uint MAX_THREADS = 32;
 
 ConvLayer::ConvLayer(double lambda, uint kernelSize, uint inputChannels,
@@ -401,14 +403,24 @@ void ConvLayer::print(std::ostream&)
 
 }
 
-Json::Value ConvLayer::Serialize()
+void ConvLayer::Serialize(Json::Value& config, std::ofstream& weigths)
 {
-	return Json::Value();
+	config[ConvLayerConfigNodeName]["lambda"] = this->lambda;
+	config[ConvLayerConfigNodeName]["stride"] = this->stride;
+	config[ConvLayerConfigNodeName]["padding"] = this->padding;
+	config[ConvLayerConfigNodeName]["kernelSize"] = this->kernelSize;
+	this->weights.Serrialize(config[ConvLayerConfigNodeName]["weights"], weigths);
+	this->bias.Serrialize(config[ConvLayerConfigNodeName]["bias"], weigths);
 }
 
-void ConvLayer::DeSerialize(Json::Value json)
+void ConvLayer::DeSerialize(Json::Value& config, std::ifstream& weigths)
 {
-
+	this->lambda = config[ConvLayerConfigNodeName]["lambda"].asDouble();
+	this->stride = config[ConvLayerConfigNodeName]["stride"].asUInt();
+	this->padding = config[ConvLayerConfigNodeName]["padding"].asUInt();
+	this->kernelSize = config[ConvLayerConfigNodeName]["kernelSize"].asUInt();
+	this->weights = Tensor(config[ConvLayerConfigNodeName]["weights"], weigths);
+	this->bias = Tensor(config[ConvLayerConfigNodeName]["bias"], weigths);
 }
 
 __global__ void pad(double* value, double* result, const uint padding,

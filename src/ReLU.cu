@@ -46,14 +46,12 @@ void ReLU::print(std::ostream& out)
     out << "ReLU\n";
 }
 
-Json::Value ReLU::Serialize()
+void ReLU::Serialize(Json::Value& config, std::ofstream&)
 {
-    Json::Value json;
-    json["ReLU"] = "";
-    return json;
+    config["ReLU"] = "";
 }
 
-void ReLU::DeSerialize(Json::Value)
+void ReLU::DeSerialize(Json::Value&, std::ifstream&)
 {
 }
 

@@ -35,21 +35,16 @@ Tensor::Tensor(const cv::Mat& value)
 	HandleCudaStatus(cudaMemcpy((void*)(this->data), (void*)value.data, dataSize * sizeof(double), cudaMemcpyHostToDevice));
 }
 
-Tensor::Tensor(Json::Value json)
+Tensor::Tensor(Json::Value& config, std::ifstream& binaryData)
 {
-	this->width = json["Tensor"]["width"].asInt();
-	this->height = json["Tensor"]["height"].asInt();
-	this->channels = json["Tensor"]["channels"].asInt();
-	this->four = json["Tensor"]["four"].asInt();
-	this->dataSize = json["Tensor"]["dataSize"].asInt();
+	this->width = config["Tensor"]["width"].asInt();
+	this->height = config["Tensor"]["height"].asInt();
+	this->channels = config["Tensor"]["channels"].asInt();
+	this->four = config["Tensor"]["four"].asInt();
+	this->dataSize = config["Tensor"]["dataSize"].asInt();
 
 	double* dataOnCpu = new double[this->dataSize];
-
-	Json::Value array = json["Tensor"]["data"];
-	for (uint i = 0; i < this->dataSize; ++i)
-	{
-		dataOnCpu[i] = array[i].asDouble();
-	}
+	binaryData.read(reinterpret_cast<char*>(dataOnCpu), this->dataSize * sizeof(double));
 
 	HandleCudaStatus(cudaMalloc((void**)&(this->data), dataSize * sizeof(double)));
 	HandleCudaStatus(cudaMemcpy((void*)(this->data), (void*)dataOnCpu, this->dataSize * sizeof(double), cudaMemcpyHostToDevice));
@@ -85,6 +80,20 @@ Tensor::~Tensor()
 		cudaFree(this->data);
 		HandleCudaStatus(cudaGetLastError());
 	}
+}
+
+void Tensor::Serrialize(Json::Value& config, std::ofstream& binaryData)
+{
+	config["Tensor"]["width"] = this->width;
+	config["Tensor"]["height"] = this->height;
+	config["Tensor"]["channels"] = this->channels;
+	config["Tensor"]["four"] = this->four;
+	config["Tensor"]["dataSize"] = this->dataSize;
+
+	double* dataOnCpu = new double[this->dataSize];
+	HandleCudaStatus(cudaMemcpy((void*)dataOnCpu, (void*)this->data, this->dataSize * sizeof(double), cudaMemcpyDeviceToHost));
+
+	binaryData.write(reinterpret_cast<char*>(dataOnCpu), this->dataSize * sizeof(double));
 }
 
 __global__ void add(double* data, double value, double* result, uint size)
@@ -298,29 +307,6 @@ cv::Mat TensorToCvMat(Tensor& value)
 	HandleCudaStatus(cudaMemcpy((void*)result.data, (void*)value.data, value.dataSize * sizeof(double), cudaMemcpyDeviceToHost));
 
 	return result;
-}
-
-Json::Value TensorToJson(Tensor& value)
-{
-	Json::Value data;
-	data["Tensor"]["width"] = value.width;
-	data["Tensor"]["height"] = value.height;
-	data["Tensor"]["channels"] = value.channels;
-	data["Tensor"]["four"] = value.four;
-	data["Tensor"]["dataSize"] = value.dataSize;
-
-	double* dataOnCpu = new double[value.dataSize];
-	HandleCudaStatus(cudaMemcpy((void*)dataOnCpu, (void*)value.data, value.dataSize * sizeof(double), cudaMemcpyDeviceToHost));
-
-	Json::Value array(Json::arrayValue);
-	for (uint i = 0; i < value.dataSize; ++i)
-	{
-		array.append(dataOnCpu[i]);
-	}
-
-	data["Tensor"]["data"] = array;
-	
-	return data;
 }
 
 curandGenerator_t CreateGenerator()

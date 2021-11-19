@@ -4,6 +4,8 @@
 #include <numeric>
 #include <iostream>
 
+const char* BatchNormalizationConfigNodeName = "BatchNormalization";
+
 const uint MAX_THREADS = 32;
 const double EPS = 1e-6;
 
@@ -158,15 +160,18 @@ void BatchNormalization::print(std::ostream& out)
 
 }
 
-Json::Value BatchNormalization::Serialize()
+void BatchNormalization::Serialize(Json::Value& config, std::ofstream& weigths)
 {
-	Json::Value json;
-
-	return json;
+	config[BatchNormalizationConfigNodeName]["lambda"] = this->lambda;
+	this->gamma.Serrialize(config[BatchNormalizationConfigNodeName]["gamma"], weigths);
+	this->beta.Serrialize(config[BatchNormalizationConfigNodeName]["beta"], weigths);
 }
 
-void BatchNormalization::DeSerialize(Json::Value)
+void BatchNormalization::DeSerialize(Json::Value& config, std::ifstream& weigths)
 {
+	this->lambda = config[BatchNormalizationConfigNodeName]["lambda"].asDouble();
+	this->gamma = Tensor(config[BatchNormalizationConfigNodeName]["gamma"], weigths);
+	this->beta = Tensor(config[BatchNormalizationConfigNodeName]["beta"], weigths);
 }
 
 

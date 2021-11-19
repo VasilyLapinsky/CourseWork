@@ -14,8 +14,8 @@ public:
 
 public:
 	void print(std::ostream&) override;
-	Json::Value Serialize() override;
-	void DeSerialize(Json::Value json) override;
+	void Serialize(Json::Value& config, std::ofstream& weigths) override;
+	void DeSerialize(Json::Value& config, std::ifstream& weigths) override;
 
 private:
 	Tensor Forward(Tensor& input);

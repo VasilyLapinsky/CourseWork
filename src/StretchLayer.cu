@@ -46,23 +46,20 @@ void StretchLayer::print(std::ostream& out)
 	out << "Channels: " << this->channels << " Width: " << this->width << " Height: " << this->height <<'\n';
 }
 
-Json::Value StretchLayer::Serialize()
+void StretchLayer::Serialize(Json::Value& config, std::ofstream&)
 {
-	Json::Value json;
-	json["StretchLayer"]["width"] = this->width;
-	json["StretchLayer"]["height"] = this->height;
-	json["StretchLayer"]["channels"] = this->channels;
-	json["StretchLayer"]["four"] = this->four;
-
-	return json;
+	config[StretchLayerConfigNodeName]["width"] = this->width;
+	config[StretchLayerConfigNodeName]["height"] = this->height;
+	config[StretchLayerConfigNodeName]["channels"] = this->channels;
+	config[StretchLayerConfigNodeName]["four"] = this->four;
 }
 
-void StretchLayer::DeSerialize(Json::Value json)
+void StretchLayer::DeSerialize(Json::Value& config, std::ifstream&)
 {
-	this->width = json["StretchLayer"]["width"].asInt();
-	this->height = json["StretchLayer"]["height"].asInt();
-	this->channels = json["StretchLayer"]["channels"].asInt();
-	this->four = json["StretchLayer"]["four"].asInt();
+	this->width = config[StretchLayerConfigNodeName]["width"].asInt();
+	this->height = config[StretchLayerConfigNodeName]["height"].asInt();
+	this->channels = config[StretchLayerConfigNodeName]["channels"].asInt();
+	this->four = config[StretchLayerConfigNodeName]["four"].asInt();
 }
 
 Tensor StretchLayer::ReShapeIntoRow(Tensor& input)
