@@ -179,23 +179,6 @@ __global__ void back_propagate_dw(double* inputs, double* dy, double* dw,
 	}
 }
 
-/*
-__device__ int max(int x, int y)
-{
-	return x > y ? x : y;
-}
-
-__device__ uint umax(uint x, uint y)
-{
-	return x > y ? x : y;
-}
-
-__device__ uint umin(uint x, uint y)
-{
-	return x < y ? x : y;
-}
-*/
-
 __global__ void back_propagate_dx(double* filters, double* dy, double* dx,
 	const uint stride, const int kernelSize,
 	const uint filtersChannels, const uint filtersFour,
@@ -405,6 +388,7 @@ void ConvLayer::print(std::ostream&)
 
 void ConvLayer::Serialize(Json::Value& config, std::ofstream& weigths)
 {
+	config["name"] = ConvLayerConfigNodeName;
 	config[ConvLayerConfigNodeName]["lambda"] = this->lambda;
 	config[ConvLayerConfigNodeName]["stride"] = this->stride;
 	config[ConvLayerConfigNodeName]["padding"] = this->padding;

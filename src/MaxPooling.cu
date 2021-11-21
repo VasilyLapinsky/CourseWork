@@ -1,5 +1,6 @@
 #include "MaxPooling.h"
 
+const char* MaxPoolingConfigNodeName = "StretchLayer";
 const uint MAX_THREADS = 32;
 
 MaxPooling::MaxPooling(uint pool, uint stride)
@@ -49,11 +50,15 @@ void MaxPooling::print(std::ostream&)
 
 void MaxPooling::Serialize(Json::Value& config, std::ofstream&)
 {
-	config["MaxPooling"] = "";
+	config["name"] = MaxPoolingConfigNodeName;
+	config[MaxPoolingConfigNodeName]["pool"] = this->pool;
+	config[MaxPoolingConfigNodeName]["stride"] = this->stride;
 }
 
-void MaxPooling::DeSerialize(Json::Value&, std::ifstream&)
+void MaxPooling::DeSerialize(Json::Value& config, std::ifstream&)
 {
+	this->pool = config[MaxPoolingConfigNodeName]["pool"].asUInt();
+	this->stride = config[MaxPoolingConfigNodeName]["stride"].asUInt();
 }
 
 __global__ void max_pool(double* data, double* result, const uint pool, const uint stride,

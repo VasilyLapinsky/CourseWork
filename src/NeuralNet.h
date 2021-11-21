@@ -1,7 +1,6 @@
 #pragma once
 #include "Layer.h"
 #include "DatasetReaderInterface.h"
-#include "LayersEnum.h"
 #include "CpuLayers.h"
 
 class NeuralNet
@@ -30,5 +29,4 @@ private:
 private:
 	std::vector<std::shared_ptr<LayerInterface>> layers;
 	std::vector<std::shared_ptr<cpu::Layer>> cpuLayers;
-	std::map<std::string, LayerTypes> associationMap;
 };

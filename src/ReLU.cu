@@ -48,7 +48,7 @@ void ReLU::print(std::ostream& out)
 
 void ReLU::Serialize(Json::Value& config, std::ofstream&)
 {
-    config["ReLU"] = "";
+    config["name"] = "ReLU";
 }
 
 void ReLU::DeSerialize(Json::Value&, std::ifstream&)

@@ -21,7 +21,14 @@ Tensor::Tensor(uint width, uint height, uint channels, uint four)
 	, four{four}
 	, dataSize{width * height * channels * four}
 {
-	HandleCudaStatus(cudaMalloc((void**)&this->data, dataSize * sizeof(double)));
+	if (dataSize != 0)
+	{
+		HandleCudaStatus(cudaMalloc((void**)&this->data, dataSize * sizeof(double)));
+	}
+	else
+	{
+		this->data = nullptr;
+	}
 }
 
 Tensor::Tensor(const cv::Mat& value)
@@ -57,8 +64,15 @@ Tensor::Tensor(const Tensor& value)
 	, four {value.four}
 	, dataSize{value.dataSize}
 {
-	HandleCudaStatus(cudaMalloc((void**)&(this->data), dataSize * sizeof(double)));
-	HandleCudaStatus(cudaMemcpy((void*)(this->data), (void*)value.data, dataSize * sizeof(double), cudaMemcpyDeviceToDevice));
+	if (dataSize != 0)
+	{
+		HandleCudaStatus(cudaMalloc((void**)&(this->data), dataSize * sizeof(double)));
+		HandleCudaStatus(cudaMemcpy((void*)(this->data), (void*)value.data, dataSize * sizeof(double), cudaMemcpyDeviceToDevice));
+	}
+	else
+	{
+		this->data = nullptr;
+	}
 }
 
 Tensor::Tensor(Tensor&& value)
@@ -170,9 +184,11 @@ Tensor Tensor::operator*(double value) const
 	dim3 threads(MAX_THREADS);
 
 	Tensor result(this->width, this->height, this->channels, this->four);
-	mult<<<grids, threads>>>(this->data, value, result.data, dataSize);
-
-	HandleCudaStatus(cudaGetLastError());
+	if (result.dataSize != 0)
+	{
+		mult << <grids, threads >> > (this->data, value, result.data, dataSize);
+		HandleCudaStatus(cudaGetLastError());
+	}
 
 	return result;
 }
@@ -325,6 +341,10 @@ curandGenerator_t CreateGenerator()
 Tensor GenerateUniformDistributionTensor(uint width, uint height, uint channels, uint four)
 {
 	Tensor result(width, height, channels, four);
+	if (result.dataSize == 0)
+	{
+		return result;
+	}
 
 	auto randomNumberGenerator = CreateGenerator();
 	HandleCudaRandStatus(curandGenerateUniformDouble(randomNumberGenerator, result.data, result.dataSize));
@@ -335,6 +355,10 @@ Tensor GenerateUniformDistributionTensor(uint width, uint height, uint channels,
 Tensor GenerateNormalDistributionTensor(uint width, uint height, uint channels, uint four, double mean, double stddev)
 {
 	Tensor result(width, height, channels, four);
+	if (result.dataSize == 0)
+	{
+		return result;
+	}
 
 	auto randomNumberGenerator = CreateGenerator();
 	if (result.dataSize % 2 == 0)
@@ -365,6 +389,10 @@ __global__ void fill(double* matrix, uint size, double val) {
 Tensor GenerateFilledTensor(uint width, uint height, uint channels, uint four, double value)
 {
 	Tensor result(width, height, channels, four);
+	if (result.dataSize == 0)
+	{
+		return result;
+	}
 
 	const uint BLOCK_SIZE = 256;
 	const uint NUM_BLOCKS = (result.dataSize + BLOCK_SIZE - 1) / (result.dataSize);

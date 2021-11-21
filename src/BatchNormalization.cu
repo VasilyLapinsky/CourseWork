@@ -162,6 +162,7 @@ void BatchNormalization::print(std::ostream& out)
 
 void BatchNormalization::Serialize(Json::Value& config, std::ofstream& weigths)
 {
+	config["name"] = BatchNormalizationConfigNodeName;
 	config[BatchNormalizationConfigNodeName]["lambda"] = this->lambda;
 	this->gamma.Serrialize(config[BatchNormalizationConfigNodeName]["gamma"], weigths);
 	this->beta.Serrialize(config[BatchNormalizationConfigNodeName]["beta"], weigths);

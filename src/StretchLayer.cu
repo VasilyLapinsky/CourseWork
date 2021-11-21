@@ -48,6 +48,7 @@ void StretchLayer::print(std::ostream& out)
 
 void StretchLayer::Serialize(Json::Value& config, std::ofstream&)
 {
+	config["name"] = StretchLayerConfigNodeName;
 	config[StretchLayerConfigNodeName]["width"] = this->width;
 	config[StretchLayerConfigNodeName]["height"] = this->height;
 	config[StretchLayerConfigNodeName]["channels"] = this->channels;

@@ -7,6 +7,7 @@
 #include "SoftMax.h"
 #include "BatchNormalization.h"
 #include "MaxPooling.h"
+#include "LayersBuilder.h"
 #include <iostream>
 #include <fstream>
 
@@ -16,17 +17,7 @@ const char* NetConfurationNode = "NetConfiguration";
 
 //---------------------------------------------------------
 
-std::map<std::string, LayerTypes> CreateAssociationMap()
-{
-	return { {"StretchLayer", LayerTypes::StretchLayerType},
-			 {"FullyConnected", LayerTypes::FullyConnectedType},
-			 {"ReLU", LayerTypes::ReLUType},
-			 {"SoftMax", LayerTypes::SoftMaxType}
-	};
-}
-
 NeuralNet::NeuralNet()
-	: associationMap{ CreateAssociationMap ()}
 {
 	double lr = 0.1;
 	/*
@@ -79,7 +70,6 @@ NeuralNet::NeuralNet()
 }
 
 NeuralNet::NeuralNet(std::string configfilePath, std::string weightsPath)
-	: associationMap{ CreateAssociationMap() }
 {
 	this->Load(configfilePath, weightsPath);
 }
@@ -106,14 +96,16 @@ void NeuralNet::Save(std::string configfilePath, std::string weightsPath)
 
 void NeuralNet::Load(std::string configfilePath, std::string weightsPath)
 {
+	this->layers.clear();
+
 	std::ifstream configReader(configfilePath);
 	Json::Value config;
 	configReader >> config;
 	std::ifstream weights(weightsPath, std::ios::binary);
 
-	for (size_t i = 0; i < this->layers.size(); ++i)
+	for (size_t i = 0; i < config.size(); ++i)
 	{
-		this->layers[i]->DeSerialize(config["Layer" + std::to_string(i)], weights);
+		this->layers.push_back(ReadLayer(config["Layer" + std::to_string(i)], weights));
 	}
 }
 

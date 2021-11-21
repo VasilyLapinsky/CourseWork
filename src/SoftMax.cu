@@ -45,7 +45,7 @@ void SoftMax::print(std::ostream& out)
 
 void SoftMax::Serialize(Json::Value& config, std::ofstream&)
 {
-    config["SoftMax"] = "";
+    config["name"] = "SoftMax";
 }
 
 void SoftMax::DeSerialize(Json::Value&, std::ifstream&)

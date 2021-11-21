@@ -89,6 +89,7 @@ void FullyConnected::print(std::ostream& out)
 
 void FullyConnected::Serialize(Json::Value& config, std::ofstream& weigths)
 {
+	config["name"] = FullyConnectedConfigNodeName;
 	config[FullyConnectedConfigNodeName]["lambda"] = this->lambda;
 	this->weights.Serrialize(config[FullyConnectedConfigNodeName]["weights"], weigths);
 	this->bias.Serrialize(config[FullyConnectedConfigNodeName]["bias"], weigths);

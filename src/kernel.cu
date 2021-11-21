@@ -41,9 +41,18 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 
 int main()
 {
-	/*
-	NeuralNet net;
+	
+	NeuralNet net("config.json", "weights.bin");
+	net.Save("config.json", "weights.bin");
 
+	std::ifstream input("config.json");
+	Json::Value json;
+	input >> json;
+	std::cout << json << '\n';
+	char ch;
+	std::cin >> ch;
+
+	/*
 	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<MnistDatasetReader>(DATA_FOLDER);
 	net.train(datsetReader, 32, 1);
 
@@ -87,6 +96,7 @@ int main()
 		std::cout << '\n';
 	}
 	*/
+	/*
 	{
 		cv::Mat cpuData(5, 5, CV_64F);
 		cpuData = 1;
@@ -114,4 +124,5 @@ int main()
 		int check;
 		std::cin >> check;
 	}
+	*/
 }
