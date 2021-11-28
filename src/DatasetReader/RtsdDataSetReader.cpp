@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <opencv2/core/core.hpp>
 
-const std::string TRAIN_CSV_FILE_NAME = "gt_train.csv";
+const std::string TRAIN_CSV_FILE_NAME = "/gt_train.csv";
 const std::string RTSD_TRAIN_FOLDER = "train";
 
 std::vector<std::pair<unsigned int, std::string>> ReadRTSD(const std::string path)
@@ -29,7 +29,7 @@ std::vector<std::pair<unsigned int, std::string>> ReadRTSD(const std::string pat
 		}
 		values.second = path + '/' + RTSD_TRAIN_FOLDER + '/' + single_value;
 
-		if (getline(temp, single_value, ','))
+		if (!getline(temp, single_value, ','))
 		{
 			return {};
 		}

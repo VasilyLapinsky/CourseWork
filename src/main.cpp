@@ -1,6 +1,8 @@
 #include "NeuralNet/NeuralNet.h"
 #include "DatasetReader/MnistDatasetReader.h"
+#include "DatasetReader/RtsdDatasetReader.h"
 #include "DatasetReader/UniversalDatasetReader.h"
+#include "Visualization/NeuralNetVisualizer.h"
 #include "NeuralNet/StretchLayer.h"
 #include "NeuralNet/FullyConnected.h"
 #include "NeuralNet/ReLU.h"
@@ -14,6 +16,7 @@
 
 const std::string DATA_FOLDER = "C:/Course Work/data";
 const std::string MNIST_FOLDER = DATA_FOLDER + "/mnist";
+const std::string RTSD_FOLDER = DATA_FOLDER + "/rtsd-r1";
 
 
 const std::string CONFIG_FILE_PATH = "config.yaml";
@@ -45,13 +48,13 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 
 int main()
 {
+	//NeuralNet net;
+	//net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
+
+	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
+	NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
 	
-	NeuralNet net;
-
-	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadMnist(MNIST_FOLDER));
-	std::cout << "Net Train\n";
-	net.train(datsetReader, 32, 1);
-
+	visualizer.RunVisualization();
 	/*
 	double low = -500.0;
 	double high = +500.0;
