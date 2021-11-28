@@ -12,7 +12,10 @@
 #include <fstream>
 #include <json/json.h>
 
-const std::string DATA_FOLDER = "C:/Course Work/data/mnist";
+const std::string DATA_FOLDER = "C:/Course Work/data";
+const std::string MNIST_FOLDER = DATA_FOLDER + "/mnist";
+
+
 const std::string CONFIG_FILE_PATH = "config.yaml";
 const std::string WEIGHTS_FILE_PATH = "weights.bin";
 
@@ -43,9 +46,10 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 int main()
 {
 	
-	NeuralNet net("config.json", "weights.bin");
+	NeuralNet net;
 
-	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadMnist(DATA_FOLDER));
+	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadMnist(MNIST_FOLDER));
+	std::cout << "Net Train\n";
 	net.train(datsetReader, 32, 1);
 
 	/*

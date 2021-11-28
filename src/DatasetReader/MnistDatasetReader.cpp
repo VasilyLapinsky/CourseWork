@@ -2,7 +2,7 @@
 #include <fstream>
 #include <algorithm>
 
-const std::string INDEX_FILE_PREFIX = "index_";
+const std::string INDEX_FILE_PREFIX = "/index_";
 const std::string MNIST_FOLDER = "mnist_png";
 
 std::vector<std::pair<unsigned int, std::string>> ReadMnist(const std::string path)
@@ -16,7 +16,7 @@ std::vector<std::pair<unsigned int, std::string>> ReadMnist(const std::string pa
 		std::string imageFile;
 		std::vector<std::pair<unsigned int, std::string>> temp;
 
-		while (!in.eof())
+		while (in.is_open() && !in.eof())
 		{
 			in >> imageFile;
 

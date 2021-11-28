@@ -11,15 +11,15 @@ void ShuffleData(std::vector<std::pair<uint, std::string>>& data)
 	}
 }
 
-UniversalDatasetReader::UniversalDatasetReader(std::vector<std::pair<uint, std::string>> &datasetFileNames, bool shufle)
-	: datasetFileNames{datasetFileNames}
+UniversalDatasetReader::UniversalDatasetReader(std::vector<std::pair<uint, std::string>> &inputDatasetFileNames, bool shufle)
+	: datasetFileNames{inputDatasetFileNames}
 {
 	if (shufle)
 	{
-		ShuffleData(datasetFileNames);
+		ShuffleData(this->datasetFileNames);
 	}
 
-	this->datasetIterator = datasetFileNames.begin();
+	this->datasetIterator = this->datasetFileNames.begin();
 }
 
 Tensor ReadImage(const std::string path)
@@ -62,7 +62,7 @@ std::pair<std::vector<Tensor>, std::vector<uint>> UniversalDatasetReader::GetDat
 	images.resize(resultBatchSize);
 	numbers.resize(resultBatchSize);
 
-	for (int i = 0; i < resultBatchSize; ++i)
+	for (uint i = 0; i < resultBatchSize; ++i)
 	{
 		auto file = *this->datasetIterator;
 		this->datasetIterator++;
