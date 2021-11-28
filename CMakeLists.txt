@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.8)
 
 set(PROJECT_NAME CourseWork)
 
@@ -35,6 +35,16 @@ cuda_add_executable(${PROJECT_NAME}
     ${SOURCES}
     ${HEADERS}
 )
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src 
+            FILES ${SOURCES}
+)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src 
+            FILES ${HEADERS}
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set_property(TARGET ${PROJECT_NAME} 
              PROPERTY CUDA_SEPARABLE_COMPILATION ON)

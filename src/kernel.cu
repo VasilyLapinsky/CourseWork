@@ -1,17 +1,18 @@
-#include "NeuralNet.h"
-#include "MnistDatasetReader.h"
-#include "StretchLayer.h"
-#include "FullyConnected.h"
-#include "ReLU.h"
-#include "SoftMax.h"
-#include "ConvLayer.h"
-#include "MaxPooling.h"
-#include "MathFunctions.h"
+#include "NeuralNet/NeuralNet.h"
+#include "DatasetReader/MnistDatasetReader.h"
+#include "DatasetReader/UniversalDatasetReader.h"
+#include "NeuralNet/StretchLayer.h"
+#include "NeuralNet/FullyConnected.h"
+#include "NeuralNet/ReLU.h"
+#include "NeuralNet/SoftMax.h"
+#include "NeuralNet/ConvLayer.h"
+#include "NeuralNet/MaxPooling.h"
+#include "NeuralNet/MathFunctions.h"
 #include <iostream>
 #include <fstream>
 #include <json/json.h>
 
-const std::string DATA_FOLDER = "C:/Course Work/data/";
+const std::string DATA_FOLDER = "C:/Course Work/data/mnist";
 const std::string CONFIG_FILE_PATH = "config.yaml";
 const std::string WEIGHTS_FILE_PATH = "weights.bin";
 
@@ -43,19 +44,11 @@ int main()
 {
 	
 	NeuralNet net("config.json", "weights.bin");
-	net.Save("config.json", "weights.bin");
 
-	std::ifstream input("config.json");
-	Json::Value json;
-	input >> json;
-	std::cout << json << '\n';
-	char ch;
-	std::cin >> ch;
-
-	/*
-	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<MnistDatasetReader>(DATA_FOLDER);
+	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadMnist(DATA_FOLDER));
 	net.train(datsetReader, 32, 1);
 
+	/*
 	double low = -500.0;
 	double high = +500.0;
 
