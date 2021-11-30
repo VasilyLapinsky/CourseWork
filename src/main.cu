@@ -48,21 +48,22 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 
 int main()
 {
-	//NeuralNet net;
-	//net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
-
+	NeuralNet net;
 	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
-	NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
-	
-	visualizer.RunVisualization();
+	net.train(datsetReader, 64, 1);
+	net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
+
+	// std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
+	// NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
+	// visualizer.RunVisualization();
 	/*
 	double low = -500.0;
 	double high = +500.0;
 
-	ConvLayer conv(0.1, 5, 1, 5, 1, 0);
+	ConvLayer conv(0.1, 3, 1, 1, 1, 0);
 	std::cout << "Gpu weight: \n";
 	PrintTensor(conv.weights);
-	cpu::ConvLayer cpuConv(1, 5, 5, 1, 0.1, 0);
+	cpu::ConvLayer cpuConv(1, 3, 1, 1, 0.1, 0);
 	std::cout << "Cpu weight: \n";
 	PrintTensor(ToTensor(cpuConv.weights));
 
@@ -96,33 +97,19 @@ int main()
 		std::cout << '\n';
 	}
 	*/
-	/*
-	{
-		cv::Mat cpuData(5, 5, CV_64F);
-		cpuData = 1;
-		cpuData.at<double>(3, 2) = 2;
-		cpuData.at<double>(2, 3) = 3;
-		Tensor gpuData(cpuData);
-
-		Json::Value json; 
-		std::ofstream weigths("weigths.bin", std::ios::binary);
-		gpuData.Serrialize(json, weigths);
-		std::cout << json << std::endl;
-		std::ofstream output("config.json");
-		output << json;
-		output.close();
-	}
-	{
-		std::ifstream input("config.json");
-		std::ifstream weigths("weigths.bin", std::ios::binary);
-		Json::Value json;
-		input >> json;
-		std::cout << json << std::endl;
-
-		Tensor gpuReaded(json, weigths);
-		std::cout << TensorToCvMat(gpuReaded) << std::endl;
-		int check;
-		std::cin >> check;
-	}
-	*/
+	
+	ConvLayer conv(0.1, 5, 1, 3, 1, 0);
+	Tensor data = GenerateUniformDistributionTensor(48, 48, 1, 1);
+	
+	std::cout << "Weights:\n";
+	PrintTensor(conv.weights);
+	std::cout << "data:\n";
+	PrintTensor(data);
+	std::cout << "forward:\n";
+	auto forward = conv.compute(data);
+	PrintTensor(forward);
+	std::cout << "backward:\n";
+	auto backward = conv.backPropagate(forward);
+	PrintTensor(backward);
+	
 }

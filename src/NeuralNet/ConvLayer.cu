@@ -189,64 +189,104 @@ __global__ void back_propagate_dx(double* filters, double* dy, double* dx,
 	int x = blockIdx.x * blockDim.x + threadIdx.x;
 	int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-	if (x < dxWidth && y < dxHeight)
+	if (y < dxHeight && x < dxWidth)
 	{
 		uint dxId = x + y * dxRowSize;
-		uint dyId = 0;
+		uint dyId = max(0, (x - kernelSize + 1)) + max(0, (y - kernelSize + 1)) * dyRowSize;
+
 		uint width = 0;
 		uint height = 0;
-		uint filterId = 0;
+		int filterIdX = 0;
+		int filterIdY = 0;
 
-		if (x < kernelSize || y < kernelSize)
+		if ((dxWidth - x) < kernelSize)
 		{
-			dyId = max(0, (x - kernelSize + 1)) + max(0, (y - kernelSize + 1)) * dyRowSize;
-			width = umin(kernelSize, x+1) / stride;
-			height = umin(kernelSize, y+1) / stride;
-			filterId = 0;
+			width = umin(kernelSize, dxWidth - x) / stride;
+			filterIdX = kernelSize - stride;
 		}
-		else if ((dxWidth - x) < kernelSize || (dxHeight - y) < kernelSize)
+		else if (x < kernelSize)
 		{
-			if ((x / stride) + kernelSize > dxWidth || (y / stride) + kernelSize > dxWidth)
-			{
-				return;
-			}
+			width = umin(kernelSize, x + 1) / stride;
+			filterIdX = x;
+		}
+		else 
+		{
+			width = kernelSize / stride;
+			filterIdX = kernelSize - 1;
+		}
 
-			dyId = (x - kernelSize + 1) + (y - kernelSize + 1) * dyRowSize;
-			width = umin(kernelSize, dxWidth - x + 1) / stride;
-			height = umin(kernelSize, dxHeight - y + 1) / stride;
-			filterId = (kernelSize - dxWidth + x) + (kernelSize - dxHeight + y) * filtersRowSize;
-			
+		if ((dxHeight - y) < kernelSize)
+		{
+			height = umin(kernelSize, dxHeight - y) / stride;
+			filterIdY = kernelSize - stride;
+		}
+		else if (y < kernelSize)
+		{
+			height = umin(kernelSize, y + 1) / stride;
+			filterIdY = y;
 		}
 		else
 		{
-			dyId = (x - kernelSize + 1) + (y - kernelSize + 1) * dyRowSize;
-			width = kernelSize / stride;
 			height = kernelSize / stride;
-			filterId = 0;
+			filterIdY = (kernelSize - 1);
 		}
+
+		int filterId = filterIdX + filterIdY * kernelSize;
 
 		for (uint f = 0; f < filtersFour; ++f)
 		{
+			if (filterId < 0)
+			{
+				printf("new filter: %d\n", filterId);
+			}
 			for (uint h = 0; h < height; ++h)
 			{
+				if (filterId < 0)
+				{
+					printf("new row: %d, predId: %d -= %d * %d - %d\n", filterId, filterId += stride * kernelSize - width, stride, kernelSize, width);
+				}
 				for (uint w = 0; w < width; ++w)
 				{
+					if (filterId < 0)
+					{
+						printf("new elem: %d\n", filterId);
+					}
 					if (dyId >= dyDataSize)
 					{
+						printf("error: %d - %d\n", dxId, dyId);
 						return;
 					}
 					double coeff = dy[dyId];
 					for (uint c = 0; c < filtersChannels; ++c)
 					{
+						if (filterId >= filtersFourSize * filtersFour)
+						{
+							printf("error: %d (%d, %d) (%d, %d) - %d - %d\n", filterId,  filterIdY, filterIdX, height, width, filtersFourSize, f);
+							return;
+						}
 						dx[dxId + c * dxChannelSize] += coeff * filters[filterId + c * filtersChannelSize];
+						/*
+						if (c == 0)
+						{
+							uint dyY = dyId / dyRowSize;
+							uint dyX = dyId - dyY * dyRowSize;
+							uint filterY = filterId / kernelSize;
+							uint filterX = filterId  - filterY * kernelSize;
+
+							printf("(%d, %d) = (%d, %d) * (%d, %d): %d\n", y, x, dyY, dyX, filterY, filterX, filterId);
+							printf("(%d, %d) = width: %d, height: %d\n", y, x, width, height);
+							//printf("(%d, %d) %f = %f * %f; %d - %d \n", x, y, dx[dxId + c * dxChannelSize], coeff, 
+							//	filters[filterId + c * filtersChannelSize], dxId + c * dxChannelSize, filterId + c * filtersChannelSize);
+						}
+						*/
 					}
 					++dyId;
-					filterId += stride;
+					filterId -= stride;
 				}
 				dyId += dyRowSize - width;
-				filterId += stride * filtersRowSize - width;
+				filterId -= stride * kernelSize - width;
 			}
-			filterId += filtersFourSize - stride * height * filtersRowSize;
+			filterId = (f+1) * filtersFourSize + filterIdX + filterIdY * filtersRowSize;
 			dyId += dyChannelSize - height * dyRowSize;
 		}
 	}
@@ -345,6 +385,7 @@ std::vector<Tensor> ConvLayer::backPropagate(std::vector<Tensor>& dy)
 
 			batchDw += dw;
 			dx = BackPropagatePadding(dx, this->padding);
+			HandleCudaStatus(cudaGetLastError());
 			batchDx.push_back(dx);
 			db = SumForChannels(dy[i]);
 			batchDb += db;

@@ -14,12 +14,13 @@
 //---------------------------------------------------------
 
 const char* NetConfurationNode = "NetConfiguration";
+const size_t NUMBER_OF_CLASSES = 67;
 
 //---------------------------------------------------------
 
 NeuralNet::NeuralNet()
 {
-	double lr = 0.1;
+	double lr = 10;
 	/*
 	this->layers.push_back(std::make_shared<BatchNormalization>(lr, 28, 28));
 	this->layers.push_back(std::make_shared<ConvLayer>(lr, 5, 1, 1, 1, 0));
@@ -29,8 +30,8 @@ NeuralNet::NeuralNet()
 	this->layers.push_back(std::make_shared<FullyConnected>(32, 10, lr));
 	this->layers.push_back(std::make_shared<SoftMax>());
 	*/
-	//this->layers.push_back(std::make_shared<BatchNormalization>(lr, 28, 28));
-	this->layers.push_back(std::make_shared<ConvLayer>(lr, 5, 1, 6, 1, 2));
+	this->layers.push_back(std::make_shared<BatchNormalization>(lr, 48, 48));
+	this->layers.push_back(std::make_shared<ConvLayer>(lr, 5, 1, 6, 1, 0));
 	this->layers.push_back(std::make_shared<ReLU>());
 	this->layers.push_back(std::make_shared<MaxPooling>(2, 2));
 	// this->layers.push_back(std::make_shared<BatchNormalization>(lr, 14, 14, 6));
@@ -39,10 +40,13 @@ NeuralNet::NeuralNet()
 	this->layers.push_back(std::make_shared<MaxPooling>(2, 2));
 	this->layers.push_back(std::make_shared<ConvLayer>(lr, 5, 16, 120, 1, 0));
 	this->layers.push_back(std::make_shared<ReLU>());
-	this->layers.push_back(std::make_shared<StretchLayer>(1, 1, 120));
-	this->layers.push_back(std::make_shared<FullyConnected>(120, 84, lr));
+	this->layers.push_back(std::make_shared<MaxPooling>(2, 2));
+	this->layers.push_back(std::make_shared<ConvLayer>(lr, 2, 120, 480, 1, 0));
 	this->layers.push_back(std::make_shared<ReLU>());
-	this->layers.push_back(std::make_shared<FullyConnected>(84, 10, lr));
+	this->layers.push_back(std::make_shared<StretchLayer>(1, 1, 480));
+	this->layers.push_back(std::make_shared<FullyConnected>(480, 240, lr));
+	this->layers.push_back(std::make_shared<ReLU>());
+	this->layers.push_back(std::make_shared<FullyConnected>(240, NUMBER_OF_CLASSES, lr));
 	this->layers.push_back(std::make_shared<SoftMax>());
 
 	/*
@@ -112,7 +116,7 @@ void NeuralNet::Load(std::string configfilePath, std::string weightsPath)
 
 Tensor OneHotEncode(uint number)
 {
-	cv::Mat encoded = cv::Mat::zeros(1, 10, CV_64F);
+	cv::Mat encoded = cv::Mat::zeros(1, NUMBER_OF_CLASSES, CV_64F);
 	encoded.at<double>(number) = 1;
 	return encoded;
 }
@@ -127,7 +131,7 @@ std::vector<Tensor> OneHotEncode(std::vector<uint> &numbers)
 
 void NeuralNet::train(std::unique_ptr<DatasetReaderInterface>& datsetReader, int batchSize, int epoch)
 {
-	const uint VISUALIZATION_BATCH = 100;
+	const uint VISUALIZATION_BATCH = 64;
 	uint elapsedImageCounter = 0;
 	uint visualizationCounter = 0;
 	for (int e = 0; e < epoch; ++e)
@@ -144,7 +148,7 @@ void NeuralNet::train(std::unique_ptr<DatasetReaderInterface>& datsetReader, int
 			// std::cout << "BatchNorm Gradient: \n" << TensorToCvMat(y[0]) << '\n';
 
 			visualizationCounter += x.size();
-			if (visualizationCounter > VISUALIZATION_BATCH)
+			if (visualizationCounter >= VISUALIZATION_BATCH)
 			{
 				elapsedImageCounter += visualizationCounter;
 				visualizationCounter = 0;
@@ -154,9 +158,9 @@ void NeuralNet::train(std::unique_ptr<DatasetReaderInterface>& datsetReader, int
 				this->Evaluate(x, y);
 			}
 		}
+		datsetReader->Restart();
 	}
 
-	datsetReader->Restart();
 	const uint VALIDATION_DATA_SIZE = 1000;
 	std::cout << "Validation on " << VALIDATION_DATA_SIZE << '\n';
 
