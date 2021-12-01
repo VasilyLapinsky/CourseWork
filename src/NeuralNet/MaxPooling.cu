@@ -1,6 +1,6 @@
 #include "NeuralNet/MaxPooling.h"
 
-const char* MaxPoolingConfigNodeName = "StretchLayer";
+const char* MaxPoolingConfigNodeName = "MaxPooling";
 const uint MAX_THREADS = 32;
 
 MaxPooling::MaxPooling(uint pool, uint stride)
