@@ -20,7 +20,7 @@ const size_t NUMBER_OF_CLASSES = 67;
 
 NeuralNet::NeuralNet()
 {
-	double lr = 10;
+	double lr = 0.5;
 	/*
 	this->layers.push_back(std::make_shared<BatchNormalization>(lr, 28, 28));
 	this->layers.push_back(std::make_shared<ConvLayer>(lr, 5, 1, 1, 1, 0));

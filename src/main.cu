@@ -18,9 +18,9 @@ const std::string DATA_FOLDER = "C:/Course Work/data";
 const std::string MNIST_FOLDER = DATA_FOLDER + "/mnist";
 const std::string RTSD_FOLDER = DATA_FOLDER + "/rtsd-r1";
 
-
-const std::string CONFIG_FILE_PATH = "config.yaml";
-const std::string WEIGHTS_FILE_PATH = "weights.bin";
+const std::string WEIGHTS_FOLDER = "C:/Course Work/weights";
+const std::string CONFIG_FILE_PATH = WEIGHTS_FOLDER + "/config.json";
+const std::string WEIGHTS_FILE_PATH = WEIGHTS_FOLDER + "/weights.bin";
 
 Tensor ToTensor(std::vector<cv::Mat>& data)
 {
@@ -48,14 +48,14 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 
 int main()
 {
-	NeuralNet net;
-	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
-	net.train(datsetReader, 64, 1);
-	net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
+	//NeuralNet net(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
+	//std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
+	//net.train(datsetReader, 64, 1);
+	//net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
 
-	// std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
-	// NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
-	// visualizer.RunVisualization();
+	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
+	NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
+	visualizer.RunVisualization();
 	/*
 	double low = -500.0;
 	double high = +500.0;
@@ -97,7 +97,7 @@ int main()
 		std::cout << '\n';
 	}
 	*/
-	
+	/*
 	ConvLayer conv(0.1, 5, 1, 3, 1, 0);
 	Tensor data = GenerateUniformDistributionTensor(48, 48, 1, 1);
 	
@@ -111,5 +111,5 @@ int main()
 	std::cout << "backward:\n";
 	auto backward = conv.backPropagate(forward);
 	PrintTensor(backward);
-	
+	*/
 }

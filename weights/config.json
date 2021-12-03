@@ -1,0 +1,286 @@
+{
+	"Layer0" : 
+	{
+		"BatchNormalization" : 
+		{
+			"beta" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 2304,
+					"four" : 1,
+					"height" : 48,
+					"width" : 48
+				}
+			},
+			"gamma" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 2304,
+					"four" : 1,
+					"height" : 48,
+					"width" : 48
+				}
+			},
+			"lambda" : 0.5
+		},
+		"name" : "BatchNormalization"
+	},
+	"Layer1" : 
+	{
+		"ConvLayer" : 
+		{
+			"bias" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 6,
+					"four" : 1,
+					"height" : 1,
+					"width" : 6
+				}
+			},
+			"kernelSize" : 5,
+			"lambda" : 0.5,
+			"padding" : 0,
+			"stride" : 1,
+			"weights" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 150,
+					"four" : 6,
+					"height" : 5,
+					"width" : 5
+				}
+			}
+		},
+		"name" : "ConvLayer"
+	},
+	"Layer10" : 
+	{
+		"ConvLayer" : 
+		{
+			"bias" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 480,
+					"four" : 1,
+					"height" : 1,
+					"width" : 480
+				}
+			},
+			"kernelSize" : 2,
+			"lambda" : 0.5,
+			"padding" : 0,
+			"stride" : 1,
+			"weights" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 120,
+					"dataSize" : 230400,
+					"four" : 480,
+					"height" : 2,
+					"width" : 2
+				}
+			}
+		},
+		"name" : "ConvLayer"
+	},
+	"Layer11" : 
+	{
+		"name" : "ReLU"
+	},
+	"Layer12" : 
+	{
+		"StretchLayer" : 
+		{
+			"channels" : 480,
+			"four" : 1,
+			"height" : 1,
+			"width" : 1
+		},
+		"name" : "StretchLayer"
+	},
+	"Layer13" : 
+	{
+		"FullyConnected" : 
+		{
+			"bias" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 240,
+					"four" : 1,
+					"height" : 1,
+					"width" : 240
+				}
+			},
+			"lambda" : 0.5,
+			"weights" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 115200,
+					"four" : 1,
+					"height" : 480,
+					"width" : 240
+				}
+			}
+		},
+		"name" : "FullyConnected"
+	},
+	"Layer14" : 
+	{
+		"name" : "ReLU"
+	},
+	"Layer15" : 
+	{
+		"FullyConnected" : 
+		{
+			"bias" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 67,
+					"four" : 1,
+					"height" : 1,
+					"width" : 67
+				}
+			},
+			"lambda" : 0.5,
+			"weights" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 16080,
+					"four" : 1,
+					"height" : 240,
+					"width" : 67
+				}
+			}
+		},
+		"name" : "FullyConnected"
+	},
+	"Layer16" : 
+	{
+		"name" : "SoftMax"
+	},
+	"Layer2" : 
+	{
+		"name" : "ReLU"
+	},
+	"Layer3" : 
+	{
+		"MaxPooling" : 
+		{
+			"pool" : 2,
+			"stride" : 2
+		},
+		"name" : "MaxPooling"
+	},
+	"Layer4" : 
+	{
+		"ConvLayer" : 
+		{
+			"bias" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 16,
+					"four" : 1,
+					"height" : 1,
+					"width" : 16
+				}
+			},
+			"kernelSize" : 5,
+			"lambda" : 0.5,
+			"padding" : 0,
+			"stride" : 1,
+			"weights" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 6,
+					"dataSize" : 2400,
+					"four" : 16,
+					"height" : 5,
+					"width" : 5
+				}
+			}
+		},
+		"name" : "ConvLayer"
+	},
+	"Layer5" : 
+	{
+		"name" : "ReLU"
+	},
+	"Layer6" : 
+	{
+		"MaxPooling" : 
+		{
+			"pool" : 2,
+			"stride" : 2
+		},
+		"name" : "MaxPooling"
+	},
+	"Layer7" : 
+	{
+		"ConvLayer" : 
+		{
+			"bias" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 1,
+					"dataSize" : 120,
+					"four" : 1,
+					"height" : 1,
+					"width" : 120
+				}
+			},
+			"kernelSize" : 5,
+			"lambda" : 0.5,
+			"padding" : 0,
+			"stride" : 1,
+			"weights" : 
+			{
+				"Tensor" : 
+				{
+					"channels" : 16,
+					"dataSize" : 48000,
+					"four" : 120,
+					"height" : 5,
+					"width" : 5
+				}
+			}
+		},
+		"name" : "ConvLayer"
+	},
+	"Layer8" : 
+	{
+		"name" : "ReLU"
+	},
+	"Layer9" : 
+	{
+		"MaxPooling" : 
+		{
+			"pool" : 2,
+			"stride" : 2
+		},
+		"name" : "MaxPooling"
+	}
+}
