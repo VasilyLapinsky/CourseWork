@@ -29,4 +29,6 @@ private:
 private:
 	std::vector<std::shared_ptr<LayerInterface>> layers;
 	std::vector<std::shared_ptr<cpu::Layer>> cpuLayers;
+
+	std::ofstream learningLogs;
 };

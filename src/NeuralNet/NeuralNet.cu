@@ -134,6 +134,9 @@ void NeuralNet::train(std::unique_ptr<DatasetReaderInterface>& datsetReader, int
 	const uint VISUALIZATION_BATCH = 64;
 	uint elapsedImageCounter = 0;
 	uint visualizationCounter = 0;
+
+	this->learningLogs.open("logs.csv");
+	this->learningLogs << "accuracy, loss" << '\n';
 	for (int e = 0; e < epoch; ++e)
 	{
 		while (datsetReader->IsDataAvailable())
@@ -170,6 +173,8 @@ void NeuralNet::train(std::unique_ptr<DatasetReaderInterface>& datsetReader, int
 
 	x = this->compute(x);
 	this->Evaluate(x, y);
+
+	this->learningLogs.close();
 }
 
 Tensor NeuralNet::compute(Tensor input)
@@ -285,7 +290,9 @@ void NeuralNet::Evaluate(std::vector<Tensor>& predicted, std::vector<Tensor>& gr
 		batchAccuracy += predictedClassIndx == groundtruthClassIndx;
 		loss += crossEntropy(predicted[i], groundtruth[i]);
 	}
+	auto accuracy = (static_cast<double>(batchAccuracy) / static_cast<double>(batchSize));
+	loss /= static_cast<double>(batchSize);
+	std::cout << "Accuracy: " << accuracy << " loss: " << loss   << "\n";
 
-	std::cout << " Accuracy: " << (static_cast<double>(batchAccuracy) / static_cast<double>(batchSize)) <<
-		" loss: " << loss / static_cast<double>(batchSize) << "\n";
+	this->learningLogs << accuracy << " , " << loss << '\n';
 }

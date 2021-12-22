@@ -48,14 +48,14 @@ Tensor ToTensor(std::vector<std::vector<cv::Mat>>& data)
 
 int main()
 {
-	//NeuralNet net(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
-	//std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
-	//net.train(datsetReader, 64, 1);
-	//net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);
-
+	/*NeuralNet net;
 	std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
-	NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
-	visualizer.RunVisualization();
+	net.train(datsetReader, 64, 3);
+	net.Save(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH);*/
+
+	//std::unique_ptr<DatasetReaderInterface> datsetReader = std::make_unique<UniversalDatasetReader>(ReadRTSD(RTSD_FOLDER));
+	//NeuralNetVisualizer visualizer(CONFIG_FILE_PATH, WEIGHTS_FILE_PATH, std::move(datsetReader));
+	//visualizer.RunVisualization();
 	/*
 	double low = -500.0;
 	double high = +500.0;
@@ -112,4 +112,46 @@ int main()
 	auto backward = conv.backPropagate(forward);
 	PrintTensor(backward);
 	*/
+
+	double low = -500.0;
+	double high = +500.0;
+
+	std::ofstream out("compare_backprop_fc.csv");
+	out << "size, gpu, cpu\n";
+
+	const int NUM_REPS = 100;
+	for (int i = 10000; i <= 25000; i+=1000)
+	{
+		cv::Mat data(1, i, CV_64F);
+		cv::randu(data, cv::Scalar(low), cv::Scalar(high));
+		Tensor gpudata(data);
+		auto cpudata = std::vector<cv::Mat>{ data };
+
+		FullyConnected fc(i, 1000, 0.1);
+		cpu::FullyConnected cpufc(i, 1000, 0.1);
+
+		gpudata = fc.compute(gpudata);
+		cpudata = cpufc.compute(cpudata);
+
+		std::chrono::microseconds gpuTime(0);
+		for (int r = 0; r < NUM_REPS; ++r)
+		{
+			auto start = std::chrono::steady_clock::now();
+			fc.backPropagate(gpudata);
+			gpuTime += std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start);
+		}
+		gpuTime /= NUM_REPS;
+
+		std::chrono::microseconds cpuTime(0);
+		for (int r = 0; r < NUM_REPS; ++r)
+		{
+			auto start = std::chrono::steady_clock::now();
+			cpufc.backPropagate(cpudata);
+			cpuTime += std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start);
+		}
+		cpuTime /= NUM_REPS;
+
+		out << i << ", " << gpuTime.count() << ", " << cpuTime.count() << '\n';
+		std::cout << i << ", " << gpuTime.count() << ", " << cpuTime.count() << '\n';
+	}
 }

@@ -235,35 +235,36 @@ __global__ void back_propagate_dx(double* filters, double* dy, double* dx,
 
 		for (uint f = 0; f < filtersFour; ++f)
 		{
-			if (filterId < 0)
+			/*if (filterId < 0)
 			{
 				printf("new filter: %d\n", filterId);
-			}
+			}*/
 			for (uint h = 0; h < height; ++h)
 			{
-				if (filterId < 0)
+				/*if (filterId < 0)
 				{
 					printf("new row: %d, predId: %d -= %d * %d - %d\n", filterId, filterId += stride * kernelSize - width, stride, kernelSize, width);
-				}
+				}*/
 				for (uint w = 0; w < width; ++w)
 				{
-					if (filterId < 0)
-					{
-						printf("new elem: %d\n", filterId);
-					}
-					if (dyId >= dyDataSize)
-					{
-						printf("error: %d - %d\n", dxId, dyId);
-						return;
-					}
+					//if (filterId < 0)
+					//{
+					//	printf("new elem: %d\n", filterId);
+					//}
+					//if (dyId >= dyDataSize)
+					//{
+					//	// TODO: fix
+					//	printf("error: %d - %d\n", dxId, dyId);
+					//	return;
+					//}
 					double coeff = dy[dyId];
 					for (uint c = 0; c < filtersChannels; ++c)
 					{
-						if (filterId >= filtersFourSize * filtersFour)
+						/*if (filterId >= filtersFourSize * filtersFour)
 						{
 							printf("error: %d (%d, %d) (%d, %d) - %d - %d\n", filterId,  filterIdY, filterIdX, height, width, filtersFourSize, f);
 							return;
-						}
+						}*/
 						dx[dxId + c * dxChannelSize] += coeff * filters[filterId + c * filtersChannelSize];
 						/*
 						if (c == 0)
